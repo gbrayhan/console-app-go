@@ -1,0 +1,9 @@
+
+# IDES
+.idea
+
+# compilado
+command-go
+main
+
+console-app-go
