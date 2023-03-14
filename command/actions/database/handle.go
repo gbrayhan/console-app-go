@@ -1,13 +1,21 @@
+// Package database package database to implement actions on database
 package database
 
 import (
-	"fmt"
+	"github.com/gbrayhan/console-app-go/command/actions/database/backup"
 	"github.com/spf13/cobra"
-	"strings"
 )
 
-func Handler(cmd *cobra.Command, args []string) {
-	fmt.Println("Hello from subcommand!")
-	fmt.Println("Print: " + strings.Join(args, "|"))
+func HandlerRun(cmd *cobra.Command, args []string) {
+	switch cmd.Flag("action").Value.String() {
+	case "backup":
+		backup.Backup(args, cmd.Flag("type").Value.String())
+	case "restore":
+		println("Restore")
+	case "compare":
+		println("Compare")
+	default:
+		println("No action")
+	}
 
 }
