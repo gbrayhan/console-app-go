@@ -20,13 +20,15 @@ func mysqlBackup(args []string) {
 		println(err.Error())
 		return
 	}
+	println("Validated mapArgs")
 
 	timestamp := time.Now().Format("2006-01-02-15-04-05")
 	tables := strings.Split(mapArgs["tables"], ",")
 
-	if len(tables) > 0 {
+	if len(tables) > 0 && tables[0] != "" {
+		println("Dumping tables")
 		for _, table := range tables {
-			cmd := exec.Command("mysqldump", "--host="+mapArgs["db_host"], "--port="+mapArgs["db_port"], "--user="+mapArgs["db_user"], "--password="+mapArgs["db_pass"],
+			cmd := exec.Command("mysqldump", "--host="+mapArgs["db_host"], "--port="+mapArgs["db_port"], "--user="+mapArgs["db_user"], "--password="+mapArgs["db_password"],
 				"--single-transaction", "--routines", "--triggers", "--add-drop-database", "--column-statistics=0", mapArgs["db_name"], table)
 			output, err := cmd.Output()
 			if err != nil {
@@ -44,15 +46,16 @@ func mysqlBackup(args []string) {
 		return
 	}
 
+	println("No tables specified, dumping entire database")
 	cmd := exec.Command("mysqldump", "--host="+mapArgs["db_host"], "--port="+mapArgs["db_port"], "--user="+mapArgs["db_user"], "--password="+mapArgs["db_password"],
 		"--single-transaction", "--routines", "--triggers", "--add-drop-database", "--column-statistics=0", mapArgs["db_name"])
 	output, err := cmd.Output()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("some error:", err)
 		return
 	}
 
-	filename := fmt.Sprintf(mapArgs["dir_backup"]+"/%s-%s-%s-dump.sql", timestamp, mapArgs["db_name"])
+	filename := fmt.Sprintf(mapArgs["dir_backup"]+"/%s-%s-dump.sql", timestamp, mapArgs["db_name"])
 	err = os.WriteFile(filename, output, 0644)
 	if err != nil {
 		fmt.Println(err)
